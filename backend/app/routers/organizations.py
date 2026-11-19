@@ -9,6 +9,7 @@ from app.models.user import User
 from app.schemas.organization import (
     OrganizationCreate,
     OrganizationOut,
+    WorkspaceBase,
     WorkspaceCreate,
     WorkspaceOut,
     WorkspaceMemberCreate,
