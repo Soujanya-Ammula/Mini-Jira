@@ -125,11 +125,10 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Allows all origins including your Vercel deployment URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
 )
 
 @app.get("/", tags=["Root"])

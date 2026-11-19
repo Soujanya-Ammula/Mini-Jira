@@ -3,14 +3,24 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Explicitly load the root .env file to avoid conflicts with other .env files
-env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"))
-load_dotenv(dotenv_path=env_path)
+# Load environment variables
+load_dotenv()
 
+# Check for DATABASE_URL in environment (Render PostgreSQL / Cloud DB / Local)
 DATABASE_URL = os.getenv("DATABASE_URL")
-print("DATABASE_URL =", DATABASE_URL)   # Temporary for testing
 
-engine = create_engine(DATABASE_URL)
+# Handle Render's postgres:// prefix which needs to be postgresql:// for SQLAlchemy
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Fallback for development if not provided
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///./minijira.db"
+
+# SQLite requires check_same_thread=False
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 SessionLocal = sessionmaker(
     autocommit=False,
