@@ -9,6 +9,11 @@ load_dotenv()
 # Check for DATABASE_URL in environment (Render PostgreSQL / Cloud DB / Local)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# On Render or any Linux host, if DATABASE_URL contains localhost, avoid connection refused
+is_render = os.getenv("RENDER") is not None
+if is_render and (not DATABASE_URL or "localhost" in DATABASE_URL or "127.0.0.1" in DATABASE_URL):
+    DATABASE_URL = "sqlite:///./minijira.db"
+
 # Handle Render's postgres:// prefix which needs to be postgresql:// for SQLAlchemy
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
